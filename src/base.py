@@ -24,11 +24,13 @@ def chkfile(filename):
     file_path = filename
 
     if (os.path.isfile(file_path)):
+        # 讀已經存在的檔案
         with open(file_path, 'rb') as f:
             data = pickle.load(f)
             return data
 
     else:
+        #  寫入conf.data的資料到新的檔案
         with open(file_path, 'wb') as f:
             pickle.dump(conf.data, f, pickle.HIGHEST_PROTOCOL)
             return conf.data
@@ -49,7 +51,7 @@ def whire_output(filename, data):
     '''
     file_path = os.path.join(chkdir(conf.LOG_DIR), "%s.txt" % filename )
 
-    f = open(file_path, 'a+')
+    f = open(file_path, 'a+',encoding='utf-8')
     f.write('## 測驗結果\n')
     f.write('作答：%s\n' % data.get('fix_view'))
     f.write('測驗時間：%s\n' % data.get('min'))
@@ -63,20 +65,20 @@ def whire_output(filename, data):
 def whire_output_html(filename, data):
     file_path = os.path.join(chkdir(conf.LOG_DIR), "%s.html" % filename)
 
-    f = open(file_path, 'a+')
+    f = open(file_path, 'a+',encoding='utf-8')
     f.write('<h2>測驗結果</h2>')
     f.write('<p>作答：%s</p>' % data.get('fix_view'))
     f.write('<p>測驗時間：%s分鐘 ' % data.get('min'))
     f.write('字數統計：%s ' % data.get('max'))
     f.write('正確字數：%s ' % data.get('ok'))
     f.write('錯誤字數：%s ' % data.get('miss'))
-    f.write('平均字數：%s </p>' % data.get('avg'))
-
+    f.write('平均字數：%s ' % data.get('avg'))
+    f.write('使用複製次數：%s次 </p>'% data.get('copynum'))
 
 def create_output_html(filename, topic):
     file_path = os.path.join(chkdir(conf.LOG_DIR), "%s.html" % filename)
 
-    f = open(file_path, 'w')
+    f = open(file_path, 'w',encoding='utf-8')
 
     f.write("<h1>%s</h1>" % filename)
     f.write('<p>題目：%s</p>' % topic)

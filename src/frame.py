@@ -12,17 +12,15 @@ import datetime
 
 class MyFrame1(wx.Frame):
     def __init__(self):
-        wx.Frame.__init__(self, None, id=wx.ID_ANY, title="中文打字測驗", pos=wx.DefaultPosition, size=wx.Size(510, 300),
+        wx.Frame.__init__(self, None, id=wx.ID_ANY, title="中文打字測驗    版次:2.0", pos=wx.DefaultPosition, size=wx.Size(510, 300),
                           style=wx.CAPTION | wx.CLOSE_BOX | wx.MINIMIZE_BOX | wx.TAB_TRAVERSAL)
-
-
 
         # loc = wx.IconLocation(r'icon.ico', 0)
         icon = wx.EmptyIcon()
         icon.CopyFromBitmap(wx.Bitmap(r'icon.ico', wx.BITMAP_TYPE_ANY))
 
-        self.SetIcon(icon)
-        self.SetBackgroundColour((246, 222, 116))
+        self.SetIcon(icon)  # 設定ICON
+        self.SetBackgroundColour((246, 222, 116))  # 背景顏色
 
         # self.Ba
         # --- Default
@@ -60,16 +58,20 @@ class MyFrame1(wx.Frame):
         #  Exercise Test_btn
         #  Exercise Test_btn
         self.btn_Start = wx.Button(self, wx.ID_ANY, "開始", (200, 200), wx.Size(60, -1), 0)
-        self.btn_Exercise = wx.Button(self, wx.ID_ANY, "練習", (77, 60), wx.Size(60, -1), 0)
-        self.btn_Exercise.Hide()
-        self.btn_Test = wx.Button(self, wx.ID_ANY, "測驗", (147, 60), wx.Size(60, -1), 0)
-        self.btn_Test.Hide()
+        # self.btn_Exercise = wx.Button(self, wx.ID_ANY, "練習", (77, 200), wx.Size(60, -1), 0)
+        # self.btn_Exercise.Hide()
+        # self.btn_Test = wx.Button(self, wx.ID_ANY, "測驗", (147, 200), wx.Size(60, -1), 0)
+        # self.btn_Test.Hide()
 
         # self.createTimer()
         self.bindEvent()
         self.bindMenuEvent()
 
     def menuUI(self):
+        '''
+        建立MENU布局
+        :return:
+        '''
 
         self.m_menubar = wx.MenuBar(0)
         # self.m_menubar.SetBackgroundColour((246, 222, 116))
@@ -78,7 +80,6 @@ class MyFrame1(wx.Frame):
 
         # Menu1
         self.Menu1 = wx.Menu()
-
 
         # self.menuExercise_Msg = wx.MenuItem(self.Menu1, 11, "練習結束提醒")
         # self.Menu1.AppendItem(self.menuExercise_Msg)
@@ -109,6 +110,10 @@ class MyFrame1(wx.Frame):
         self.SetMenuBar(self.m_menubar)
 
     def bindMenuEvent(self):
+        '''
+        綁定Menu功能
+        :return:
+        '''
 
         # self.Bind(wx.EVT_MENU, self.OnExercise_Msg, id=11)
         # self.Bind(wx.EVT_MENU, self.OnTest_Msg, id=12)
@@ -122,9 +127,9 @@ class MyFrame1(wx.Frame):
 
     def bindEvent(self):
 
-        self.btn_Start.Bind(wx.EVT_BUTTON, self.OnStart)
-        self.btn_Exercise.Bind(wx.EVT_BUTTON, self.OnExercise)
-        self.btn_Test.Bind(wx.EVT_BUTTON, self.OnTest)
+        self.btn_Start.Bind(wx.EVT_BUTTON, self.OnStart)  # 開始測試
+        # self.btn_Exercise.Bind(wx.EVT_BUTTON, self.OnExercise)
+        # self.btn_Test.Bind(wx.EVT_BUTTON, self.OnTest)
 
     def OnStart(self, event):
         '''
@@ -139,14 +144,12 @@ class MyFrame1(wx.Frame):
 
         name = ''
 
-
         if dlg.ShowModal() == wx.ID_OK:
             name = dlg.GetValue()
         dlg.Destroy()
 
         # --- 創建報告
         # self.startdate = time.strftime("%Y%m%d%H%M")
-
 
         if name:
             date_now = datetime.datetime.now()
@@ -165,8 +168,8 @@ class MyFrame1(wx.Frame):
 
             create_output_html(self.filename, self.data['topic'])
 
-            self.OnExercise(event)
-            self.OnTest(event)
+            self.OnExercise(event)  # 練習
+            self.OnTest(event)  # 測試
 
     def OnTopicSetting(self, event):
         '''
@@ -232,8 +235,6 @@ class MyFrame1(wx.Frame):
             self.data['wav_path']['test'] = dlg.Path
             whirefile("data.pkl", self.data)
 
-
-
         dlg.Destroy()
 
     def OnExercise_Msg(self, event):
@@ -267,7 +268,7 @@ class MyFrame1(wx.Frame):
         dlg.Destroy()
 
     def OnExercise(self, event):
-        print("Exercise 测验5分钟")
+        print("Exercise 練習5分钟")
 
         dialog = TestDialog(self, min='5', report=False)
 
@@ -288,8 +289,8 @@ class MyFrame1(wx.Frame):
 
         for i in range(loop_num):
 
-            if i+1 == finish_num:
-                # 最後一次
+            if i + 1 == finish_num:
+                # 最後一次 結束測驗
                 dig = TestDialog(self, min='2', finish=True)
             else:
                 dig = TestDialog(self, min='2')
@@ -299,5 +300,10 @@ class MyFrame1(wx.Frame):
             if dig.ShowModal() == wx.ID_OK:
                 dig.Destroy()
 
-    def createTimer(self):
-        pass
+
+
+
+if __name__ == "__main__":
+    app = wx.App()
+    frame = MyFrame1().Show()
+    app.MainLoop()

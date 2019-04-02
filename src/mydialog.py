@@ -7,6 +7,8 @@ from src.base import chkfile, whire_output_html
 
 from wx.stc import StyledTextCtrl
 
+# EVT_CONTROL_V = wx.PyEventBinder( wx.WXK_F1 )
+
 
 class TestDialog(wx.Dialog):
     '''
@@ -15,7 +17,7 @@ class TestDialog(wx.Dialog):
 
     def __init__(self, parent, min, report=True, finish=False):
         wx.Dialog.__init__(self, parent, wx.ID_ANY, title="", size=(600, 550), style=wx.CAPTION)
-
+        self.copynum = 0
         self.data = chkfile('data.pkl')
         self.topic = self.data.get('topic')
 
@@ -31,6 +33,10 @@ class TestDialog(wx.Dialog):
         self.createTimer()
 
     def initUI(self):
+        '''
+        建立布局
+        :return:
+        '''
         wx.StaticText(self, label="剩餘時間", pos=(60, 10), size=(-1, -1)).SetFont(
             wx.Font(16, 75, 90, 90, False, "MingLiU"))
 
@@ -82,6 +88,50 @@ class TestDialog(wx.Dialog):
         self.m_staticText2.Bind(wx.EVT_TEXT, self.text_evt)
         self.m_staticText2.Bind(wx.EVT_LEFT_DOWN, self.text_evt)
         self.m_staticText2.Bind(wx.EVT_KEY_DOWN, self.text_evt)
+        self.m_staticText2.Bind(wx.EVT_TEXT_COPY, self.ctrlc_evt)
+        self.m_staticText2.Bind(wx.EVT_TEXT_PASTE, self.ctrlv_evt)
+
+    def ctrlv_evt(self,event):
+        print("ctrlv_evt")
+
+        msg_data = {
+            'title': '操作錯誤',
+            'msg': '操作錯誤'
+        }
+        dig = MsgDialog(self, msg_data, center=True)
+        dig.ShowModal()
+        dig.Destroy()
+        print('複製次數', self.copynum)
+
+    def ctrlc_evt(self,event):
+        print("ctrlc_evt")
+
+        # if self.copynum < 5:
+        msg_data = {
+            'title': '操作錯誤',
+            'msg': '操作錯誤'
+        }
+        dig = MsgDialog(self, msg_data, center=True)
+        if dig.Show():
+            print('True')
+            dig.Destroy()
+            dig.ShowModal()
+        else:
+            print('False')
+            dig.ShowModal()
+        print('2222222')
+        dig.Destroy()
+        self.copynum += 1
+        print(self.copynum)
+        # elif self.x <= 100:
+        #     msg_data = {
+        #             'title': '禁制複製',
+        #             'msg': '很有耐心喔!好吧..給你複製'
+        #         }
+        #     dig = MsgDialog(self, msg_data)
+        #     dig.ShowModal()
+        #     dig.Destroy()
+        #     event.Skip() #是否延用原生功能
 
     def text_evt(self, event):
         # print("Text_evt")
@@ -96,11 +146,11 @@ class TestDialog(wx.Dialog):
 
             self.loop = self.m_staticText2.GetScrollPos(0) - self.m_staticText1.GetScrollPos(0)
             for i in range(self.loop):
-                self.m_staticText1.ScrollLines(1)
+                self.m_staticText1.ScrollLines(1) # 向下滾一頁
         elif self.m_staticText1.GetScrollPos(0) > self.m_staticText2.GetScrollPos(0):
             self.loop = self.m_staticText1.GetScrollPos(0) - self.m_staticText2.GetScrollPos(0)
             for i in range(self.loop):
-                self.m_staticText1.ScrollLines(-1)
+                self.m_staticText1.ScrollLines(-1) # 向上滾一頁
         else:
             # 滾回最上頁
             self.m_staticText1.ScrollLines(-self.m_staticText1.GetScrollRange(0))
@@ -127,12 +177,13 @@ class TestDialog(wx.Dialog):
         self.Label_MissString.SetLabel(data.get('miss'))
         self.Label_AvgString.SetLabel(data.get('avg'))
 
-        if self.report:
+        if self.report: # 判斷是否需要報告
             whire_output_html(self.filename, data)
             sound = Sound(self.data['wav_path']['test'])
             msg_data = self.data['msg']['test']
         else:
             sound = Sound(self.data['wav_path']['exercise'])
+
             msg_data = self.data['msg']['exercise']
 
         sound.Play()
@@ -145,7 +196,7 @@ class TestDialog(wx.Dialog):
                 'msg': '測驗結束'
             }
 
-            dig = MsgDialog(self, msg_data,center=True)
+            dig = MsgDialog(self, msg_data, center=True)
         else:
             dig = MsgDialog(self, msg_data)
 
@@ -159,9 +210,9 @@ class TestDialog(wx.Dialog):
         :return:
         '''
 
-        topic_line = self.cut(self.topic)
-        user_val = self.m_staticText2.GetValue()
-        user_line = user_val.replace("\n", "")
+        topic_line = self.cut(self.topic) # 題目
+        user_val = self.m_staticText2.GetValue() # 作答
+        user_line = user_val.replace("\n", "") # 換行取代空字串
 
         # user_line = self.cut(self.m_staticText2.GetValue().strip())
 
@@ -184,7 +235,8 @@ class TestDialog(wx.Dialog):
             # 20190204 修改平均字數計算方式 正確/分鐘
             'avg': str(ok / int(self.min)),
             'fix_view': "".join(fix),
-            'min': str(self.min)
+            'min': str(self.min),
+            'copynum':self.copynum
         }
 
         return data
@@ -254,6 +306,9 @@ class MsgDialog(wx.Dialog):
         self.Label_2.SetFont(wx.Font(12, 75, 90, 90, False, "SimSun"))
         self.Label_2.Hide()
 
+        # /*** Jeremy
+        self.Show(True)
+        # ***/
 
 class TopicDialog(wx.Dialog):
     '''
